@@ -1,0 +1,68 @@
+---
+
+
+- name: Install common packages
+  yum: 
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+        - git
+        - tar
+        - python-pip
+        - unzip
+        - yum-utils
+        - device-mapper-persistent-data
+        - lvm2
+
+# - name: Add docker repository
+#   yum_repository:
+#     name: epel
+#     description: EPEL YUM repo
+#     baseurl: https://download.docker.com/linux/centos/docker-ce.repo
+
+# - name: Install docker
+#   yum:
+#     name: docker-ce
+#     state: latest
+
+# - name: Assign user to docker group
+#   shell: "{{ item }}"
+#   with_items:
+#     - usermod -aG docker $USER
+#     - newgrp docker 
+
+# - name: Start docker
+#   systemd:
+#     state: started
+#     name: docker
+
+- name: Install python dependencies
+  pip:
+    name: ['jmespath', 'pexpect']
+
+- name: Set http_proxy
+  lineinfile:
+    dest: /etc/environment
+    state: absent
+    regexp: '^http_proxy='
+    line: 'export http_proxy={{ proxy_url }}'
+  
+- name: Set https_proxy
+  lineinfile:
+    dest: /etc/environment
+    state: absent
+    regexp: '^https_proxy='
+    line: 'export https_proxy={{ proxy_url }}'
+
+- name: Set no_proxy
+  lineinfile:
+    dest: /etc/environment
+    state: absent
+    regexp: '^no_proxy='
+    line: 'export no_proxy="localhost,127.0.0.0/8,10.0.0.0/8,169.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.local,.agodadev.io,.agoda.mobi"'
+  notify: load /etc/environment
+
+
+
+

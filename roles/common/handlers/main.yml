@@ -1,0 +1,6 @@
+---
+- name: load /etc/profile
+  shell: "source /etc/profile"
+
+- name: load /etc/environment
+  shell: "source /etc/environment"

@@ -1,0 +1,20 @@
+---
+- hosts: all
+  roles:
+    - role: common
+      become: yes
+      tags: [ common ]
+  tasks:
+    # - role: common
+    #   become: yes
+    #   tags: [ common ]
+    # - role: scala
+    #   tags: [ scala ]
+    - name: create github-runner
+      with_sequence: start=2 count=1
+      include_role:
+        name: github-runner
+      vars:
+        runner_name: "{{ ansible_hostname }}-{{ item }}"
+        runner_work_dir: "_work"
+        runner_dir: "actions-runner-{{ item }}"

@@ -1,0 +1,72 @@
+---
+
+
+- name: Ensure dicectory is created
+  file:
+    path: "{{ runner_dir }}"
+    state: directory
+
+# - name: Get list of download urls
+#   uri:
+#     url: https://api.github.com/repos/beetlikeyg087/todo/actions/runners/downloads
+#     headers:
+#         Authorization: "Bearer {{ github_access_token }}"
+#     method: GET
+#   register: runner_download
+
+# - name: Set download url
+#   vars:
+#     filter_regex: "[? os==`linux` && architecture==`x64`].download_url"
+#   set_fact: 
+#     download_url: "{{ runner_download.json | json_query(filter_regex) | first }}"
+
+# - name: Download Github runner
+#   get_url:
+#     url: "{{ download_url }}"
+#     dest: /tmp/actions-runner.tar.gz
+#   register: runner_repo
+
+- name: Download Github runner
+  vars:
+    runner_version: "2.164.0"
+  get_url:
+    url: "https://github.com/actions/runner/releases/download/v{{runner_version}}/actions-runner-linux-x64-{{runner_version}}.tar.gz"
+    dest: /tmp/actions-runner-linux-x64-{{runner_version}}.tar.gz
+  register: runner_repo
+
+- name: Extract downloaded file
+  unarchive:
+    src: "{{ runner_repo.dest }}"
+    dest: "~/{{ runner_dir }}"
+    remote_src: yes
+
+- name: Install dependencies
+  become: yes
+  shell: "./{{ runner_dir }}/bin/installdependencies.sh"
+
+- name: Get generate token
+  uri:
+    url: https://api.github.com/repos/beetlikeyg087/test-runner/actions/runners/registration-token
+    method: POST
+    headers:
+        Authorization: "Bearer {{ github_access_token }}"
+    status_code: 201
+  register: registration_token
+
+- name: Configure runner
+  expect: 
+    command: "./{{ runner_dir }}/config.sh --url https://github.com/beetlikeyg087/test-runner --token {{registration_token.json.token}}"
+    responses:
+        "(?i)name of runner": "{{ runner_name }}"
+        "(?i)name of work folder": "{{ runner_work_dir }}"
+    timeout: 60
+
+- name: Install service runner
+  become: yes
+  become_method: sudo
+  shell: "cd {{ runner_dir }} && ./svc.sh install"
+
+- name: Start service runner
+  become: yes
+  become_method: sudo
+  shell: "cd {{ runner_dir }} && ./svc.sh start"
