@@ -61,6 +61,22 @@
         "(?i)name of work folder": "{{ runner_work_dir }}"
     timeout: 60
 
+- name: Ensure .env is created
+  file:
+    path: "{{ runner_dir }}/.env"
+    state: file   
+
+- name: Setup proxy in .env 
+  become: yes
+  lineinfile:
+        dest: "{{ runner_dir }}/.env"
+        state: present
+        regexp: "^={{ outer_item.key }}"
+        line: '{{outer_item.key}}={{ outer_item.value }}'
+  loop: "{{ env }}"
+  loop_control:
+    loop_var: outer_item
+
 - name: Install service runner
   become: yes
   become_method: sudo

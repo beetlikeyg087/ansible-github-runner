@@ -5,13 +5,8 @@
       become: yes
       tags: [ common ]
   tasks:
-    # - role: common
-    #   become: yes
-    #   tags: [ common ]
-    # - role: scala
-    #   tags: [ scala ]
     - name: create github-runner
-      with_sequence: start=2 count=1
+      with_sequence: start=1 count=1
       include_role:
         name: github-runner
       vars:

@@ -1,2 +1,4 @@
 [all]
-centos-aws
+#centos-aws
+#github-runner
+github-runner-2

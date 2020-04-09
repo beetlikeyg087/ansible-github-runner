@@ -1,15 +1,23 @@
 ---
-
+- name: Set variables
+  lineinfile:
+    dest: /etc/environment
+    state: present
+    regexp: "^={{ item.key }}"
+    line: 'export {{item.key}}={{ item.value }}'
+  with_items: "{{ env }}"
+  notify: load /etc/environment
 
 - name: Install common packages
   yum: 
     name: "{{ packages }}"
     state: present
   vars:
+    ansible_python_interpreter: /usr/bin/python
     packages:
         - git
         - tar
-        - python-pip
+        - python3-pip
         - unzip
         - yum-utils
         - device-mapper-persistent-data
@@ -39,29 +47,8 @@
 
 - name: Install python dependencies
   pip:
+    executable: pip3
     name: ['jmespath', 'pexpect']
-
-- name: Set http_proxy
-  lineinfile:
-    dest: /etc/environment
-    state: absent
-    regexp: '^http_proxy='
-    line: 'export http_proxy={{ proxy_url }}'
-  
-- name: Set https_proxy
-  lineinfile:
-    dest: /etc/environment
-    state: absent
-    regexp: '^https_proxy='
-    line: 'export https_proxy={{ proxy_url }}'
-
-- name: Set no_proxy
-  lineinfile:
-    dest: /etc/environment
-    state: absent
-    regexp: '^no_proxy='
-    line: 'export no_proxy="localhost,127.0.0.0/8,10.0.0.0/8,169.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.local,.agodadev.io,.agoda.mobi"'
-  notify: load /etc/environment
 
 
 
