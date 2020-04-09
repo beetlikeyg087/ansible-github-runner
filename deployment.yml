@@ -1,15 +1,21 @@
 ---
 - hosts: all
-  roles:
-    - role: common
-      become: yes
-      tags: [ common ]
+#   roles:
+#     - role: common
+#       become: yes
+#       tags: [ common ]
   tasks:
-    - name: create github-runner
-      with_sequence: start=1 count=1
+    # - name: create github-runner
+    #   with_sequence: start=3 count=3
+    #   include_role:
+    #     name: github-runner/registration
+    #   vars:
+    #     runner_name: "{{ ansible_hostname }}-{{ item }}"
+    #     runner_work_dir: "_work"
+    #     runner_dir: "actions-runner-{{ item }}"
+    - name: remove github-runner
+      with_sequence: start=1 count=5
       include_role:
-        name: github-runner
+        name: github-runner/remove
       vars:
-        runner_name: "{{ ansible_hostname }}-{{ item }}"
-        runner_work_dir: "_work"
         runner_dir: "actions-runner-{{ item }}"

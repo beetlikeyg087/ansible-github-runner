@@ -1,0 +1,29 @@
+---
+
+- name: Get remove token
+  uri:
+    url: https://api.github.com/repos/beetlikeyg087/test-runner/actions/runners/remove-token
+    method: POST
+    headers:
+        Authorization: "Bearer {{ github_access_token }}"
+    status_code: 201
+  register: remove_token
+
+- name: Stop service runner
+  become: yes
+  become_method: sudo
+  shell: "cd {{ runner_dir }} && ./svc.sh stop"
+
+- name: Uninstall service runner
+  become: yes
+  become_method: sudo
+  shell: "cd {{ runner_dir }} && ./svc.sh uninstall"
+
+- name: Remove configure runner
+  shell: "./{{ runner_dir }}/config.sh remove --token {{remove_token.json.token}}"
+
+- name: Ensure folder is deleted
+  become: yes
+  file:
+    path: "{{ runner_dir }}"
+    state: absent   
