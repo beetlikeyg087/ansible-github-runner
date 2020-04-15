@@ -47,7 +47,6 @@
 
 - name: Install python dependencies
   pip:
-    executable: pip3
     name: ['jmespath', 'pexpect']
 
 

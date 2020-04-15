@@ -2,7 +2,7 @@
 
 - name: Get remove token
   uri:
-    url: https://api.github.com/repos/beetlikeyg087/test-runner/actions/runners/remove-token
+    url: https://api.github.com/repos/beetlikeyg087/terraform-actrun/actions/runners/remove-token
     method: POST
     headers:
         Authorization: "Bearer {{ github_access_token }}"
