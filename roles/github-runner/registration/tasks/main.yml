@@ -46,7 +46,7 @@
 
 - name: Get generate token
   uri:
-    url: https://api.github.com/repos/beetlikeyg087/terraform-actrun/actions/runners/registration-token
+    url: https://api.github.com/repos/beetlikeyg087/github-runner-ansible/actions/runners/registration-token
     method: POST
     headers:
         Authorization: "Bearer {{ github_access_token }}"
@@ -55,7 +55,7 @@
 
 - name: Configure runner
   expect: 
-    command: "./{{ runner_dir }}/config.sh --url https://github.com/beetlikeyg087/terraform-actrun --token {{registration_token.json.token}}"
+    command: "./{{ runner_dir }}/config.sh --url https://github.com/beetlikeyg087/github-runner-ansible --token {{registration_token.json.token}}"
     responses:
         "(?i)name of runner": "{{ runner_name }}"
         "(?i)name of work folder": "{{ runner_work_dir }}"
